@@ -1,8 +1,13 @@
+
+
+import org.example.DeleteFiles;
+import org.example.GameProgress;
+import org.example.ZipFiles;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+
 
 public class Main {
 
@@ -34,49 +39,10 @@ public class Main {
     }
 }
 
-class DeleteFiles {
-
-    public static void deleteFiles(List<String> files) {
-        for (String filePath : files) {
-            File file = new File(filePath);
-            if (file.delete()) {
-                System.out.println("Deleted file: " + filePath);
-            } else {
-                System.err.println("Failed to delete file: " + filePath);
-            }
-        }
-    }
-}
-
-class ZipFiles {
-
-    public static void zipFiles(String zipFilePath, List<String> files) {
-        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
-            for (String filePath : files) {
-                try (FileInputStream fis = new FileInputStream(filePath)) {
-                    ZipEntry zipEntry = new ZipEntry(new File(filePath).getName());
-                    zos.putNextEntry(zipEntry);
-
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = fis.read(buffer)) >= 0) {
-                        zos.write(buffer, 0, length);
-                    }
-
-                    zos.closeEntry();
-                } catch (IOException e) {
-                    System.err.println("Error zipping file: " + filePath + " - " + e.getMessage());
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error creating zip file: " + zipFilePath + " - " + e.getMessage());
-        }
-    }
-}
 
 class SaveGame {
 
-    public static void saveGame(String filePath, GameProgress gameProgress) {
+    public static <GameProgress> void saveGame(String filePath, GameProgress gameProgress) {
         try (FileOutputStream fos = new FileOutputStream(filePath);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(gameProgress);
@@ -86,28 +52,5 @@ class SaveGame {
     }
 }
 
-class GameProgress implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private int health;
-    private final int weapons;
-    private final int lvl;
-    private double distance;
 
-    public GameProgress(int health, int weapons, int lvl, double distance) {
-        this.health = health;
-        this.weapons = weapons;
-        this.lvl = lvl;
-        this.distance = distance;
-    }
-
-    @Override
-    public String toString() {
-        return "GameProgress{" +
-                "health=" + health +
-                ", weapons=" + weapons +
-                ", lvl=" + lvl +
-                ", distance=" + distance +
-                '}';
-    }
-}
